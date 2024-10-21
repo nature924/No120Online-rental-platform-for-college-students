@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.FangdongDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.username as username
+        ,a.password as password
+        ,a.fangdong_uuid_number as fangdongUuidNumber
+        ,a.fangdong_name as fangdongName
+        ,a.fangdong_phone as fangdongPhone
+        ,a.fangdong_id_number as fangdongIdNumber
+        ,a.fangdong_photo as fangdongPhoto
+        ,a.sex_types as sexTypes
+        ,a.fangdong_email as fangdongEmail
+        ,a.new_money as newMoney
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.FangdongView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+
+        FROM fangdong  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.username != '' and params.username != null and params.username != 'null' ">
+                and a.username like CONCAT('%',#{params.username},'%')
+            </if>
+            <if test=" params.password != '' and params.password != null and params.password != 'null' ">
+                and a.password like CONCAT('%',#{params.password},'%')
+            </if>
+            <if test=" params.fangdongUuidNumber != '' and params.fangdongUuidNumber != null and params.fangdongUuidNumber != 'null' ">
+                and a.fangdong_uuid_number like CONCAT('%',#{params.fangdongUuidNumber},'%')
+            </if>
+            <if test=" params.fangdongName != '' and params.fangdongName != null and params.fangdongName != 'null' ">
+                and a.fangdong_name like CONCAT('%',#{params.fangdongName},'%')
+            </if>
+            <if test=" params.fangdongPhone != '' and params.fangdongPhone != null and params.fangdongPhone != 'null' ">
+                and a.fangdong_phone like CONCAT('%',#{params.fangdongPhone},'%')
+            </if>
+            <if test=" params.fangdongIdNumber != '' and params.fangdongIdNumber != null and params.fangdongIdNumber != 'null' ">
+                and a.fangdong_id_number like CONCAT('%',#{params.fangdongIdNumber},'%')
+            </if>
+            <if test="params.sexTypes != null and params.sexTypes != ''">
+                and a.sex_types = #{params.sexTypes}
+            </if>
+            <if test=" params.fangdongEmail != '' and params.fangdongEmail != null and params.fangdongEmail != 'null' ">
+                and a.fangdong_email like CONCAT('%',#{params.fangdongEmail},'%')
+            </if>
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and a.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and a.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+            <if test="params.newMoney != null and params.newMoney != ''">
+                and a.new_money = #{params.newMoney}
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

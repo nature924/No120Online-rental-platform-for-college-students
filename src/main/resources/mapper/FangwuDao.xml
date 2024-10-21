@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.FangwuDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.fangdong_id as fangdongId
+        ,a.fangwu_name as fangwuName
+        ,a.fangwu_uuid_number as fangwuUuidNumber
+        ,a.fangwu_photo as fangwuPhoto
+        ,a.fangwu_address as fangwuAddress
+        ,a.fangwu_file as fangwuFile
+        ,a.fangwu_types as fangwuTypes
+        ,a.fangwu_zhuangtai_types as fangwuZhuangtaiTypes
+        ,a.fangwu_new_money as fangwuNewMoney
+        ,a.fangwu_content as fangwuContent
+        ,a.fangwu_delete as fangwuDelete
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.FangwuView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,fangdong.fangdong_uuid_number as fangdongUuidNumber
+        ,fangdong.fangdong_name as fangdongName
+        ,fangdong.fangdong_phone as fangdongPhone
+        ,fangdong.fangdong_id_number as fangdongIdNumber
+        ,fangdong.fangdong_photo as fangdongPhoto
+        ,fangdong.fangdong_email as fangdongEmail
+        ,fangdong.new_money as newMoney
+
+        FROM fangwu  a
+        left JOIN fangdong fangdong ON a.fangdong_id = fangdong.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.fangdongId != null and params.fangdongId != ''">
+                and (
+                    a.fangdong_id = #{params.fangdongId}
+                )
+            </if>
+            <if test=" params.fangwuName != '' and params.fangwuName != null and params.fangwuName != 'null' ">
+                and a.fangwu_name like CONCAT('%',#{params.fangwuName},'%')
+            </if>
+            <if test=" params.fangwuUuidNumber != '' and params.fangwuUuidNumber != null and params.fangwuUuidNumber != 'null' ">
+                and a.fangwu_uuid_number like CONCAT('%',#{params.fangwuUuidNumber},'%')
+            </if>
+            <if test=" params.fangwuAddress != '' and params.fangwuAddress != null and params.fangwuAddress != 'null' ">
+                and a.fangwu_address like CONCAT('%',#{params.fangwuAddress},'%')
+            </if>
+            <if test="params.fangwuTypes != null and params.fangwuTypes != ''">
+                and a.fangwu_types = #{params.fangwuTypes}
+            </if>
+            <if test="params.fangwuZhuangtaiTypes != null and params.fangwuZhuangtaiTypes != ''">
+                and a.fangwu_zhuangtai_types = #{params.fangwuZhuangtaiTypes}
+            </if>
+            <if test="params.fangwuNewMoneyStart != null ">
+                <![CDATA[  and a.fangwu_new_money >= #{params.fangwuNewMoneyStart}   ]]>
+            </if>
+            <if test="params.fangwuNewMoneyEnd != null ">
+                <![CDATA[  and a.fangwu_new_money <= #{params.fangwuNewMoneyEnd}   ]]>
+            </if>
+            <if test="params.fangwuNewMoney != null and params.fangwuNewMoney != ''">
+                and a.fangwu_new_money = #{params.fangwuNewMoney}
+            </if>
+            <if test=" params.fangwuContent != '' and params.fangwuContent != null and params.fangwuContent != 'null' ">
+                and a.fangwu_content like CONCAT('%',#{params.fangwuContent},'%')
+            </if>
+            <if test="params.fangwuDeleteStart != null and params.fangwuDeleteStart != ''">
+                <![CDATA[  and a.fangwu_delete >= #{params.fangwuDeleteStart}   ]]>
+            </if>
+            <if test="params.fangwuDeleteEnd != null and params.fangwuDeleteEnd != ''">
+                <![CDATA[  and a.fangwu_delete <= #{params.fangwuDeleteEnd}   ]]>
+            </if>
+             <if test="params.fangwuDelete != null and params.fangwuDelete != ''">
+                and a.fangwu_delete = #{params.fangwuDelete}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+                <!-- 判断房东的id不为空 -->
+            <if test=" params.fangdongIdNotNull != '' and params.fangdongIdNotNull != null and params.fangdongIdNotNull != 'null' ">
+                and a.fangdong_id IS NOT NULL
+            </if>
+            <if test=" params.fangdongUuidNumber != '' and params.fangdongUuidNumber != null and params.fangdongUuidNumber != 'null' ">
+                and fangdong.fangdong_uuid_number like CONCAT('%',#{params.fangdongUuidNumber},'%')
+            </if>
+            <if test=" params.fangdongName != '' and params.fangdongName != null and params.fangdongName != 'null' ">
+                and fangdong.fangdong_name like CONCAT('%',#{params.fangdongName},'%')
+            </if>
+            <if test=" params.fangdongPhone != '' and params.fangdongPhone != null and params.fangdongPhone != 'null' ">
+                and fangdong.fangdong_phone like CONCAT('%',#{params.fangdongPhone},'%')
+            </if>
+            <if test=" params.fangdongIdNumber != '' and params.fangdongIdNumber != null and params.fangdongIdNumber != 'null' ">
+                and fangdong.fangdong_id_number like CONCAT('%',#{params.fangdongIdNumber},'%')
+            </if>
+            <if test=" params.fangdongEmail != '' and params.fangdongEmail != null and params.fangdongEmail != 'null' ">
+                and fangdong.fangdong_email like CONCAT('%',#{params.fangdongEmail},'%')
+            </if>
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and fangdong.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and fangdong.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+            <if test="params.newMoney != null and params.newMoney != ''">
+                and a.new_money = #{params.newMoney}
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
